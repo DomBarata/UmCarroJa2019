@@ -24,52 +24,50 @@ public class UmCarroJaController {
         while (true) {
             this.nif = this.view.userLogin();
             switch (this.model.existeNif(nif)) {
-                case 1:
-                    while (password != null) {
-                        password = this.view.passwordLogin();
-                        if (this.model.checkProprietarioPassword(nif, password)){
-                            password = null;
-                            proprietarioControl();
-                        }else{
-                            errado++;
-                            password = this.view.wrongPassword(errado);
-                            if (errado == 5) {
-                                this.view.wrongPassword();
-                                exit(0);
+                case 1: while (errado < 5) {
+                            password = this.view.passwordLogin();
+                            if (this.model.checkProprietarioPassword(nif, password)){
+                                password = null;
+                                proprietarioControl();
+                            }else{
+                                errado++;
+                                this.view.wrongPassword(errado);
+                                if (errado == 5) {
+                                    this.view.wrongPassword();
+                                    exit(0);
+                                }
                             }
                         }
-                    }
-                break;
-                case 2:
-                    while (password != null) {
-                        password = this.view.passwordLogin();
-                        if (this.model.checkClientePassword(nif, password)) {
-                            password = null;
-                            clienteControl();
-                        }else{
-                            errado++;
-                            password = this.view.wrongPassword(errado);
-                            if (errado == 5) {
-                                this.view.wrongPassword();
-                                exit(0);
+                        break;
+                case 2: while (errado < 5) {
+                            password = this.view.passwordLogin();
+                            if (this.model.checkClientePassword(nif, password)) {
+                                password = null;
+                                clienteControl();
+                            }else{
+                                errado++;
+                                this.view.wrongPassword(errado);
+                                if (errado == 5) {
+                                    this.view.wrongPassword();
+                                    exit(0);
+                                }
                             }
                         }
-                    }
-                    break;
-                case 0:
-                    int op = this.view.wrongUser();
-                    if (op == 1)
-                    {
-                        model.inserirProprietario(new Proprietario(this.view.inserirNovoUser(nif)));
-                    }else if(op == 2){
-                        String[] dados = this.view.inserirNovoUser(nif);
-                        String[] local = this.view.localizacao();
+                        break;
+                case 3: exit(0);
+                case 0: int op = this.view.wrongUser();
+                        if (op == 1)
+                        {
+                            model.inserirProprietario(new Proprietario(this.view.inserirNovoUser(nif)));
+                        }else if(op == 2){
+                            String[] dados = this.view.inserirNovoUser(nif);
+                            String[] local = this.view.localizacao();
 
-                        dados[7] = local[0];
-                        dados[8] = local[1];
-                        model.inserirCliente(new Cliente(dados));
-                    }
-                    break;
+                            dados[7] = local[0];
+                            dados[8] = local[1];
+                            model.inserirCliente(new Cliente(dados));
+                        }
+                        break;
             }
         }
     }
@@ -115,10 +113,10 @@ public class UmCarroJaController {
                         prop.validarAluguer(matr, this.view.validarAluguer());
                         this.model.inserirProprietario(prop);
                         break;
-                case 8: this.view.proprietarioPerfil(this.model.getProprietario(nif));
+                case 8: this.view.getPerfil(this.model.getProprietario(nif));
                         break;
                 case 9: String nifCheck = this.view.getNif();
-                    this.view.clientePerfil(this.model.getCliente(nifCheck));
+                        this.view.getPerfil(this.model.getCliente(nifCheck));
                         break;
                 case 0: break;
             }
@@ -152,31 +150,55 @@ public class UmCarroJaController {
         do {
             op = this.view.clienteMenu();
             switch (op) {
-                case 1: this.view.printVeiculo(veiculoMaisProximo(),
-                        veiculoMaisProximo().getLocalizacao().distanceTo(
+                case 1: Veiculo maisProx = this.model.getVeiculoMaisProximo(nif);
+                        this.view.printVeiculo(maisProx,
+                        maisProx.getLocalizacao().distanceTo(
                                 this.model.getCliente(nif).getLocalizacao()
                         ));
                         break;
-                case 2: this.view.printVeiculo(veiculoMaisBarato(),
-                        veiculoMaisProximo().getLocalizacao().distanceTo(
+                case 2: Veiculo maisBar = this.model.getVeiculoMaisBarato(nif);
+                        this.view.printVeiculo(maisBar,
+                        maisBar.getLocalizacao().distanceTo(
                                 this.model.getCliente(nif).getLocalizacao()
                         ));
                         break;
-                case 3: double distancia = this.view.getDistancia();
-                        this.view.printVeiculo(veiculoMaisBarato(distancia),
-                            veiculoMaisProximo().getLocalizacao().distanceTo(
+                case 3:
+                        double distancia = this.view.getDistancia();
+                        Veiculo maisBaratDentroDist = this.model.getVeiculoMaisBarato(nif,distancia);
+                        this.view.printVeiculo(maisBaratDentroDist,
+                            maisBaratDentroDist.getLocalizacao().distanceTo(
                                     this.model.getCliente(nif).getLocalizacao()
                             ));
                         break;
                 case 4: String tipo = this.view.getTipo();
-                        List<Veiculo> listaDeCarros = this.model.getCarrosTipo(tipo);
-                        this.view.printVeiculosTipo(listaDeCarros);
+                        List<Veiculo> listaDeCarros = this.model.getListaVeiculos(tipo);
+                        this.view.printListaVeiculos(listaDeCarros, this.model.getCliente(nif).getLocalizacao());
                         break;
-                case 5: break;
-                case 6: break;
-                case 7: break;
-                case 8: break;
-                case 9: break;
+                case 5: int aut = this.view.getAutonomia();
+                        List<Veiculo> veiculosPossiveis = this.model.getListaVeiculos(aut);
+                        this.view.printListaVeiculos(veiculosPossiveis, this.model.getCliente(nif).getLocalizacao());
+                        break;
+                case 6: String matricula = this.view.getMatricula();
+                        Ponto<Double> destino =  this.view.getDestino();
+                        int queue = this.model.fazerPedido(nif, matricula, destino);
+                        out.println("Está na posição " + queue + " na lista de espera");
+                        break;
+                case 7: Pedido p = this.model.getPedido(nif);
+                        if(p.getEstado() == 2)                        {
+                            this.view.pedidoRejeitado();
+                            this.model.pedidoRejeitado(p);
+                        }else if(p.getEstado() == 1){
+                            this.view.pedidoAceite();
+                            this.model.pedidoAceite(p); //efetuar aluguer
+                        }else{
+                            this.view.pedidoPendente();
+                        }
+                        break;
+                case 8: this.view.getPerfil(this.model.getCliente(nif));
+                        break;
+                case 9: String nifCheck = this.view.getNif();
+                        this.view.getPerfil(this.model.getProprietario(nifCheck));
+                        break;
                 case 0: break;
             }
 
@@ -200,55 +222,5 @@ public class UmCarroJaController {
         return ret;
     }
 
-    private Veiculo veiculoMaisProximo(){
-        Set<String> matriculas = this.model.getMatriculas();
-        Cliente c = this.model.getCliente(nif);
-        Veiculo maisPerto = null;
-        for (String matricula: matriculas) {
-            Veiculo v = this.model.getVeiculo(matricula);
-            if(maisPerto == null &&
-                    v.getDisponivel())
-                maisPerto = v;
-            else if(maisPerto != null &&
-                    c.getLocalizacao().distanceTo(maisPerto.getLocalizacao()) >
-                    c.getLocalizacao().distanceTo(v.getLocalizacao()) &&
-                    v.getDisponivel())
-                maisPerto = v;
-        }
-        return maisPerto;
-    }
 
-    private Veiculo veiculoMaisBarato() {
-        Set<String> matriculas = this.model.getMatriculas();
-        Cliente c = this.model.getCliente(nif);
-        Veiculo maisBarato = null;
-        for (String matricula : matriculas) {
-            Veiculo v = this.model.getVeiculo(matricula);
-            if (maisBarato == null && v.getDisponivel())
-                maisBarato = v;
-            else if (maisBarato != null &&
-                    v.getPrecoKm() < maisBarato.getPrecoKm() &&
-                    v.getDisponivel())
-                maisBarato = v;
-        }
-        return maisBarato;
-    }
-
-    private Veiculo veiculoMaisBarato(double dist){
-        Set<String> matriculas = this.model.getMatriculas();
-        Cliente c = this.model.getCliente(nif);
-        Veiculo maisBarato = null;
-        for (String matricula : matriculas) {
-            Veiculo v = this.model.getVeiculo(matricula);
-            if (maisBarato == null
-                    && v.getLocalizacao().distanceTo(c.getLocalizacao()) < dist
-                    && v.getDisponivel())
-                maisBarato = v;
-            else if (maisBarato != null && v.getPrecoKm() < maisBarato.getPrecoKm()
-                    && v.getLocalizacao().distanceTo(c.getLocalizacao()) < dist
-                    && v.getDisponivel())
-                maisBarato = v;
-        }
-        return maisBarato;
-    }
 }

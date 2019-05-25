@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,18 +41,10 @@ public class UmCarroJaView {
         return input.nextInt();
     }
 
-    public String wrongPassword(int i){
-        if (i<5) {
+    public void wrongPassword(int i){
             out.println("A password inserida está errada!");
             out.println("\tTem mais " + (5 - i) + " tentativas");
-            out.print("Insira a password novamente: ");
-            input = new Scanner(System.in);
-        }
-        else
-            input = null;
 
-
-        return input==null?null:input.next();
     }
 
     public void wrongPassword() {
@@ -61,6 +54,7 @@ public class UmCarroJaView {
 
     public String[] inserirNovoUser(String nif){
         List<String> dados = new ArrayList<>();
+        boolean flag = true;
 
         out.println("Como se chama?");
         input = new Scanner(System.in);
@@ -69,12 +63,15 @@ public class UmCarroJaView {
         input = new Scanner(System.in);
         dados.add(input.next());
         do {
-            if (!input.next().equals(dados.get(1)))
-                out.println("As passwords não coincidem");
             out.println("Repita a password");
             input = new Scanner(System.in);
+            if (!input.next().equals(dados.get(1))) {
+                out.println("As passwords não coincidem");
+            }
+            else
+                flag = false;
         }
-        while(!input.next().equals(dados.get(1)));
+        while(flag);
         dados.add(nif);
         out.println("Insira o seu email");
         input = new Scanner(System.in);
@@ -83,10 +80,15 @@ public class UmCarroJaView {
         input = new Scanner(System.in);
         dados.add(input.next());
         out.println("Insira a sua data de nascimento (DD-MM-AAAA)");
-        input = new Scanner(System.in).useDelimiter("-");
-        dados.add(input.next());
-        dados.add(input.next());
-        dados.add(input.next());
+        input = new Scanner(System.in);
+        String[] s = input.next().split("\\-");
+        dados.add(s[0]);
+        dados.add(s[1]);
+        dados.add(s[2]);
+
+
+        for(String str : dados)
+            out.println(str);
 
         return dados.toArray(String[]::new);
     }
@@ -167,14 +169,14 @@ public class UmCarroJaView {
     }
 
     public int getAutonomia(){
-        out.println("Insira a auonomia do carro");
+        out.println("Insira a autonomia do carro");
         Scanner scanner = new Scanner(System.in);
         return scanner.nextInt();
     }
 
     public Ponto<Double> getLocalizacao() {
-        out.println("Insira as coordenadas do carro (X Y)");
-        Scanner scanner = new Scanner(System.in).useDelimiter(" ");
+        out.println("Insira as coordenadas do carro (X,Y)");
+        Scanner scanner = new Scanner(System.in).useDelimiter(",");
         return new Ponto<>(scanner.nextDouble(), scanner.nextDouble());
     }
 
@@ -212,27 +214,39 @@ public class UmCarroJaView {
         return input.nextInt();
     }
 
-    public void proprietarioPerfil(Proprietario proprietario) {
-        out.println("Nome: " + proprietario.getNome());
-        out.println("Nif: " + proprietario.getMorada());
-        out.println("Email: " + proprietario.getEmail());
-        out.println("Morada: " + proprietario.getMorada());
-        out.println("Data de nascimento" + proprietario.getNascimento());
-        out.println("Classificação: " + proprietario.getClassificacao() + "/100");
+    public void getPerfil(User u){
+        out.println("Nome: " + u.getNome());
+        out.println("Nif: " + u.getNif());
+        out.println("Email: " + u.getEmail());
+        out.println("Morada: " + u.getMorada());
+        out.println("Data de nascimento: " + u.getNascimento());
+        if ((u.getClassificacao() == -1))
+            out.println("e ainda não tem classificações");
+        else
+            out.println("e está classificado em " + u.getClassificacao() + "/100");
         out.print("Prima ENTER para ver histório de alugueres...");
-        out.println();
+        try {
+            System.in.read();
+            printAlugueres(u.getHistorico());
+            System.in.read();
+        }catch (IOException exc){out.println(exc);}
 
-        printAlugueres(proprietario.getHistorico());
+
 }
 
     private void printAlugueres(List<Aluguer> historico) {
-        for (int i = 10; i > 0; i--){
+        int i = 0;
+        while (historico.size() > i && i <10){
             Aluguer a = historico.get(i);
             out.println("Veiculo: " + a.getVeiculoUsado().getMatricula());
             out.println("De: " + a.getInicioViagem());
             out.println("Até: " + a.getFimViagem());
             out.println("Percorreu: " + a.distanciaPercorrida() + "kms");
             out.println("-----------------------");
+            i++;
+        }
+        if(historico.size() == 0){
+            out.println("Não há histórico de alugueres para apresentar");
         }
 
     }
@@ -244,7 +258,7 @@ public class UmCarroJaView {
         out.println("2 - Ver o veículo mais barato");
         out.println("3 - Ver o veículo mais barato dentro de uma determinada distância");
         out.println("4 - Ver os carros de um determinado tipo");
-        out.println("5 - Ver os carros com uma determinada autonomia");
+        out.println("5 - Ver os carros com uma determinada autonomia mínima");
         out.println("6 - Efetuar pedido de aluguer");
         out.println("7 - Verificar pedido de aluguer");
         out.println("8 - Ver o meu perfil");
@@ -256,18 +270,6 @@ public class UmCarroJaView {
         return input.nextInt();
     }
 
-    public void clientePerfil(Cliente cliente) {
-        out.println("Nome: " + cliente.getNome());
-        out.println("Nif: " + cliente.getMorada());
-        out.println("Email: " + cliente.getEmail());
-        out.println("Morada: " + cliente.getMorada());
-        out.println("Data de nascimento" + cliente.getNascimento());
-        out.println("Classificação: " + cliente.getClassificacao() + "/100");
-        out.print("Prima ENTER para ver histório de alugueres...");
-        out.println();
-
-        printAlugueres(cliente.getHistorico());
-    }
 
     public void printVeiculo(Veiculo v, double distancia){
         out.println("Carro a " + v.getTipo() + " com a matrícula: " + v.getMatricula());
@@ -275,22 +277,44 @@ public class UmCarroJaView {
         out.println("consome " + v.getConsumoKm() + "l/km");
         out.println("tem um preco/km de " + v.getPrecoKm() + "€");
         out.println("anda a uma velocidade de " + v.getVelMedia() + "km/h");
-        out.println("está a uma distancia de " + distancia + "kms até ao veículo");
+        out.println("está a uma distancia de " + distancia + "kms");
         if ((v.getClassificacao() == -1))
-            out.println("O veículo ainda não tem classificações");
+            out.println("e o veículo ainda não tem classificações");
         else
             out.println("e o veículo está classificado em " + v.getClassificacao() + "/100");
     }
 
     public double getDistancia() {
         out.println("Que distância está disposto a percorrer até ao carro?");
-        input = new Scanner();
+        input = new Scanner(System.in);
 
         return input.nextDouble();
     }
 
-    public void printVeiculosTipo(List<Veiculo> listaDeCarros) {
-        for(Veiculo v : listaDeCarros)
-            out.println(v);//acabar
+    public void printListaVeiculos(List<Veiculo> listaDeCarros, Ponto<Double> clienteLocalizacao) {
+        for (Veiculo v : listaDeCarros) {
+            printVeiculo(v, v.getLocalizacao().distanceTo(clienteLocalizacao));
+            out.println("-----------------------------");
+        }
+        input = new Scanner(System.in);
+    }
+
+    public Ponto<Double> getDestino() {
+        out.println("Insira as coordenadas do destino (X,Y)");
+        Scanner scanner = new Scanner(System.in).useDelimiter(",");
+        return new Ponto<>(scanner.nextDouble(), scanner.nextDouble());
+    }
+
+    public void pedidoRejeitado() {
+        out.println("O seu pedido foi rejeitado");
+    }
+
+    public void pedidoAceite() {
+        out.println("O seu pedido foi aceite");
+        out.println("O aluguer foi feito com sucesso e a viajem realizada");
+    }
+
+    public void pedidoPendente() {
+        out.println("O seu pedido ainda está pendente");
     }
 }

@@ -1,5 +1,5 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 public class User {
@@ -8,12 +8,12 @@ public class User {
 	private String nif;
 	private String email;
 	private String morada;
-	private GregorianCalendar nascimento;
+	private LocalDate nascimento;
 	private double classificacao;
 	private int numeroAvaliacoes = 0;
 	private List<Aluguer> historico;
 
-	public User(String nome, String password, String nif, String email, String morada, GregorianCalendar nascimento) {
+	public User(String nome, String password, String nif, String email, String morada, LocalDate nascimento) {
 		this.email = email;
 		this.password = password;
 		this.nif = nif;
@@ -30,14 +30,14 @@ public class User {
 		this.nif = u.getNif();
 		this.nome = u.getNome();
 		this.morada = u.getMorada();
-		this.getNascimento();
+		this.nascimento = u.getNascimento();
 		this.classificacao = u.getClassificacao();
 		this.numeroAvaliacoes = u.getNumeroAvaliacoes();
 		this.historico = new ArrayList<>();
 		this.historico.addAll(u.getHistorico());
 	}
 
-	private String getPassword() {
+	protected String getPassword() {
 		return password;
 	}
 
@@ -51,24 +51,12 @@ public class User {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
 	public String getNome() {
 		return nome;
 	}
 
-	public void setNome(String nome) {
-		this.nome = nome;
-	}
-
 	public String getMorada() {
 		return morada;
-	}
-
-	public void setMorada(String morada) {
-		this.morada = morada;
 	}
 
 	public User clone(){
@@ -76,24 +64,32 @@ public class User {
 	}
 
 	public double getClassificacao() {
-		return classificacao;
+		if(this.numeroAvaliacoes == 0)
+			return -1;
+		else
+			return this.classificacao;
 	}
 
 	public void classificar(int valor) {
 		if(this.numeroAvaliacoes == 0){
 			this.classificacao = valor;
 			this.numeroAvaliacoes++;
-		}
-		else
-		{
+		}else{
 			this.classificacao = (this.classificacao*this.numeroAvaliacoes + valor)/++this.numeroAvaliacoes;
 		}
 	}
 
-	public GregorianCalendar getNascimento() {
-		return (GregorianCalendar) nascimento.clone();
+	@Override
+	public boolean equals(Object obj) {
+		if(obj==this) return true;
+		if(obj==null || obj.getClass() != this.getClass()) return false;
+		User le = (User) obj;
+		return le.getNif().equals(this.nif);
 	}
 
+	public LocalDate getNascimento() {
+		return nascimento;
+	}
 
 	public boolean validatePassword(String pass){
 	    return this.password.equals(pass);
@@ -103,7 +99,8 @@ public class User {
 		return historico;
 	}
 
-	public void setHistorico(Aluguer aluguer) {
-		this.historico.add(0, aluguer);
-	}
+    public void addAluguer(Aluguer alug) {
+		this.historico.add(alug);
+    }
+
 }

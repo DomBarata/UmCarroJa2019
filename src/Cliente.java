@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -7,7 +8,7 @@ public class Cliente extends User{
 	private Ponto<Double> localizacao;
 
 	public Cliente(String nome, String password, String nif, String email,
-				   String morada, GregorianCalendar nascimento, double x, double y){
+				   String morada, LocalDate nascimento, double x, double y){
 		super(nome, password, nif, email, morada, nascimento);
 		this.localizacao = new Ponto<>(x,y);
 	}
@@ -20,11 +21,9 @@ public class Cliente extends User{
 
 	public Cliente(String [] dados)
 	{
-		super(dados[0], dados[1], dados[2], dados[3], dados[4],
-				new GregorianCalendar(Integer.parseInt(dados[5]),
-						Integer.parseInt(dados[6]), Integer.parseInt(dados[7])));
-		this.localizacao = new Ponto<>(Double.parseDouble(dados[8]),
-				Double.parseDouble(dados[9]));
+		super(dados[0], dados[1], dados[2], dados[3], dados[4], LocalDate.parse(dados[5].subSequence(0,dados[5].length())));
+		this.localizacao = new Ponto<>(Double.parseDouble(dados[6]),
+				Double.parseDouble(dados[7]));
 	}
 
 	public Ponto<Double> getLocalizacao() {
@@ -40,6 +39,11 @@ public class Cliente extends User{
 				.append(",").append(localizacao.getX())
 				.append(",").append(localizacao.getY());
 		return sb.toString();
+	}
+
+	public void addAluguer(Aluguer alug) {
+		super.addAluguer(alug);
+		this.localizacao = alug.getFimViagem();
 	}
 
 	@Override

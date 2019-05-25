@@ -12,6 +12,18 @@ public class Pedido {
         this.destino = destino;
     }
 
+    public Pedido() {
+
+    }
+
+    public Pedido(Pedido p){
+        this.estado = p.getEstado();
+        this.numeroPedido = p.getNumeroPedido();
+        this.cliente = p.getCliente();
+        this.veiculo = p.getVeiculo();
+        this.destino = p.getDestino();
+    }
+
     public int getEstado(){
         return this.estado;
     }
@@ -21,11 +33,11 @@ public class Pedido {
     }
 
     public Cliente getCliente() {
-        return cliente;
+        return cliente.clone();
     }
 
     public Veiculo getVeiculo() {
-        return veiculo;
+        return veiculo.clone();
     }
 
     public int getNumeroPedido() {
@@ -38,5 +50,9 @@ public class Pedido {
 
     public Ponto<Double> getDestino() {
         return destino;
+    }
+
+    public Pedido clone(){
+        return new Pedido(this);
     }
 }

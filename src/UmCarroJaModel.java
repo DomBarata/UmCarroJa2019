@@ -30,7 +30,7 @@ public class UmCarroJaModel {
         this.clientesMap = new HashMap<>();
         veiculosMap = new HashMap<>();
 
-        List<String> input = lerAllLines("logsPOO_carregamentoInicial.bak");
+        List<String> input = lerAllLines("LogsUCJ.bak");
         String[] divisao;
         String[] argumentos;
 
@@ -39,35 +39,27 @@ public class UmCarroJaModel {
             switch (divisao[0])
             {
                 case "NovoProp":    argumentos = divisao[1].split(",");
-                                    this.proprietarioMap.put(argumentos[1], new Proprietario(argumentos));
+                                    this.proprietarioMap.put(argumentos[2], new Proprietario(argumentos));
                                     break;
                 case "NovoCliente": argumentos = divisao[1].split(",");
-                                    this.clientesMap.put(argumentos[1], new Cliente(argumentos));
+                                    this.clientesMap.put(argumentos[2], new Cliente(argumentos));
                                     break;
                 case "NovoCarro":   argumentos = divisao[1].split(",");
                                     this.veiculosMap.put(argumentos[2], new Veiculo(argumentos));
                                     break;
                 case "Aluguer":     argumentos = divisao[1].split(",");
-                                    //terminar...
+                                    insereAluguer(argumentos);
                                     break;
                 case "Classificar": argumentos = divisao[1].split(",");
-                                    if (argumentos[0].length() == 9)
-                                    {
-                                        if (this.proprietarioMap.containsKey(argumentos[0]))
-                                        {
-                                            Proprietario p = this.proprietarioMap.get(argumentos[0]);
-                                            p.classificar(Integer.parseInt(argumentos[1]));
-                                            this.proprietarioMap.put(p.getNif(), p);
-                                        }
-                                        else
-                                        {
-                                            Cliente c = this.clientesMap.get(argumentos[0]);
-                                            c.classificar(Integer.parseInt(argumentos[1]));
-                                            this.clientesMap.put(c.getNif(), c);
-                                        }
-                                    }
-                                    else
-                                    {
+                                    if (this.proprietarioMap.containsKey(argumentos[0])) {
+                                        Proprietario p = this.proprietarioMap.get(argumentos[0]);
+                                        p.classificar(Integer.parseInt(argumentos[1]));
+                                        this.proprietarioMap.put(p.getNif(), p);
+                                    }else if(this.clientesMap.containsKey(argumentos[0])) {
+                                        Cliente c = this.clientesMap.get(argumentos[0]);
+                                        c.classificar(Integer.parseInt(argumentos[1]));
+                                        this.clientesMap.put(c.getNif(), c);
+                                    }else{
                                         Veiculo v = this.veiculosMap.get(argumentos[0]);
                                         v.classificar(Integer.parseInt(argumentos[1]));
                                         this.veiculosMap.put(v.getMatricula(), v);
@@ -76,6 +68,10 @@ public class UmCarroJaModel {
                 default:            break;
             }
         }
+    }
+
+    private void insereAluguer(String[] argumentos) {
+
     }
 
 
@@ -101,7 +97,10 @@ public class UmCarroJaModel {
             return 1;
         else if(this.clientesMap.containsKey(nif))
             return 2;
-        else return 0;
+        else if(nif.equals("0"))
+            return 3;
+        else
+            return 0;
     }
 
     public boolean checkProprietarioPassword(String nif, String password) {
@@ -139,7 +138,7 @@ public class UmCarroJaModel {
         return this.veiculosMap.keySet();
     }
 
-    public List<Veiculo> getCarrosTipo(String tipo) {
+    public List<Veiculo> getListaVeiculos(String tipo) {
         List<Veiculo> carros = new ArrayList<>();
         Set<String> matriculas = this.veiculosMap.keySet();
         for(String s : matriculas){
@@ -149,4 +148,124 @@ public class UmCarroJaModel {
         }
         return carros;
     }
+
+    public int fazerPedido(String nif, String matricula, Ponto<Double> destino) {
+        Pedido pedido = new Pedido(this.clientesMap.get(nif).clone(),
+                this.veiculosMap.get(matricula).clone(),
+                destino);
+
+        Proprietario p = this.proprietarioMap.get(this.veiculosMap.get(matricula).getNifProp());
+        int numeroEspera = p.addPedido(pedido);
+        this.proprietarioMap.put(p.getNif(), p);
+
+        return numeroEspera;
+    }
+
+    public Veiculo getVeiculoMaisProximo(String nifCliente){
+        Set<String> matriculas = getMatriculas();
+        Cliente c = getCliente(nifCliente);
+        Veiculo maisPerto = null;
+        for (String matricula: matriculas) {
+            Veiculo v = getVeiculo(matricula);
+            if(maisPerto == null &&
+                    v.getDisponivel())
+                maisPerto = v;
+            else if(maisPerto != null &&
+                    c.getLocalizacao().distanceTo(maisPerto.getLocalizacao()) >
+                            c.getLocalizacao().distanceTo(v.getLocalizacao()) &&
+                    v.getDisponivel())
+                maisPerto = v;
+        }
+        return maisPerto;
+    }
+
+    public Veiculo getVeiculoMaisBarato(String nifCliente) {
+        Set<String> matriculas = getMatriculas();
+        Veiculo maisBarato = null;
+        for (String matricula : matriculas) {
+            Veiculo v = getVeiculo(matricula);
+            if (maisBarato == null && v.getDisponivel())
+                maisBarato = v;
+            else if (maisBarato != null &&
+                    v.getPrecoKm() < maisBarato.getPrecoKm() &&
+                    v.getDisponivel())
+                maisBarato = v;
+        }
+        return maisBarato;
+    }
+
+    public Veiculo getVeiculoMaisBarato(String nifCliente, double dist){
+        Set<String> matriculas = getMatriculas();
+        Cliente c = getCliente(nifCliente);
+        Veiculo maisBarato = null;
+        for (String matricula : matriculas) {
+            Veiculo v = getVeiculo(matricula);
+            if (maisBarato == null
+                    && v.getLocalizacao().distanceTo(c.getLocalizacao()) < dist
+                    && v.getDisponivel())
+                maisBarato = v;
+            else if (maisBarato != null && v.getPrecoKm() < maisBarato.getPrecoKm()
+                    && v.getLocalizacao().distanceTo(c.getLocalizacao()) < dist
+                    && v.getDisponivel())
+                maisBarato = v;
+        }
+        return maisBarato;
+    }
+
+    public List<Veiculo> getListaVeiculos(int aut) {
+        List<Veiculo> carros = new ArrayList<>();
+        Set<String> matriculas = this.veiculosMap.keySet();
+        for(String s : matriculas){
+            Veiculo v = this.veiculosMap.get(s);
+            if (v.getAutonomia() >= aut)
+                carros.add(v);
+        }
+        return carros;
+    }
+
+    public Pedido getPedido(String nif) {
+        Cliente cliente = this.clientesMap.get(nif);
+        Set<String> prop = this.proprietarioMap.keySet();
+        Pedido pedido = new Pedido();
+        for(String s : prop){
+            Proprietario proprietario = this.proprietarioMap.get(s);
+            Map<String, List<Pedido>> pedidos = proprietario.getListaDeEspera();
+            Set<String> matriculas = pedidos.keySet();
+            for(String str : matriculas){
+                List<Pedido> espera = pedidos.get(str);
+                for(Pedido p : espera){
+                    if (p.getCliente().equals(cliente))
+                        pedido = p;
+                }
+            }
+        }
+        return pedido.clone();
+    }
+
+    public void pedidoRejeitado(Pedido p) {
+        Proprietario prop = proprietarioMap.get(p.getVeiculo().getNifProp());
+        List<Pedido> pedidos = prop.getListaDeEspera().get(p.getVeiculo().getMatricula());
+        pedidos.remove(p);
+        prop.insereLista(p.getVeiculo().getMatricula(), pedidos);
+        this.proprietarioMap.put(prop.getNif(), prop);
+    }
+
+    public void pedidoAceite(Pedido p) {
+        Proprietario prop = this.proprietarioMap.get(p.getVeiculo().getNifProp());
+        List<Pedido> pedidos = prop.getListaDeEspera().get(p.getVeiculo().getMatricula());
+        pedidos.remove(p);
+        prop.insereLista(p.getVeiculo().getMatricula(), pedidos);
+
+        Veiculo veiculo = p.getVeiculo();
+        Aluguer alug = veiculo.alugar(p);
+        this.veiculosMap.put(veiculo.getMatricula(), veiculo);
+
+        prop.addAluguer(alug);
+        this.proprietarioMap.put(prop.getNif(), prop);
+
+        Cliente cli = p.getCliente();
+        cli.addAluguer(alug);
+        this.clientesMap.put(cli.getNif(), cli);
+    }
+
 }

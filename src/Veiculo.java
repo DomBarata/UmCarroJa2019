@@ -52,8 +52,6 @@ public class Veiculo {
 		this.disponivel = v.getDisponivel();
 	}
 
-
-
 	public Veiculo(String[] s)
 	{
 		this.tipo = s[0];
@@ -106,7 +104,7 @@ public class Veiculo {
 		if(this.numeroAvaliacoes == 0)
 			return -1;
 		else
-			return classificacao;
+			return this.classificacao;
 	}
 
 	public Ponto<Double> getLocalizacao() {
@@ -163,5 +161,17 @@ public class Veiculo {
 
 	public void setDisponivel(boolean disponivel) {
 		this.disponivel = disponivel;
+	}
+
+	public Aluguer alugar(Pedido p) {
+		Aluguer aluguer = new Aluguer(p.getVeiculo(),
+				p.getCliente(), p.getCliente().getLocalizacao(),
+				p.getDestino());
+		this.autonomia -= localizacao.distanceTo(p.getDestino());
+		this.localizacao = p.getDestino();
+		this.disponivel = false;
+		this.historico.add(aluguer);
+
+		return aluguer;
 	}
 }

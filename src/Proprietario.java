@@ -1,24 +1,24 @@
+import java.time.LocalDate;
 import java.util.*;
 
 public class Proprietario extends User{
     private Map<String,List<Pedido>> listaDeEspera;
 
     public Proprietario(String nome, String password, String nif,
-                        String email, String morada, GregorianCalendar nascimento) {
+                        String email, String morada, LocalDate nascimento) {
         super(nome, password, nif, email, morada, nascimento);
         this.listaDeEspera = new HashMap<>();
     }
 
     public Proprietario(Proprietario u) {
-        super(u);
+        super(u.getNome(), u.getPassword(), u.getNif(), u.getEmail(), u.getMorada(), u.getNascimento());
         this.listaDeEspera = new HashMap<>();
         this.listaDeEspera.putAll(u.getListaDeEspera());
     }
 
     public Proprietario(String[] s) {
         super(s[0], s[1], s[2], s[3], s[4],
-                new GregorianCalendar(Integer.parseInt(s[5]),
-                        Integer.parseInt(s[6]), Integer.parseInt(s[7])));
+                LocalDate.parse(s[5].subSequence(0,s[5].length())));
         this.listaDeEspera = new HashMap<>();
     }
 
@@ -26,14 +26,18 @@ public class Proprietario extends User{
         return listaDeEspera;
     }
 
-    public void addPedido(Pedido p) {
+    public int addPedido(Pedido p) {
         List<Pedido> pedidos = new ArrayList<>();
+        int tam;
         if (this.listaDeEspera.containsKey(p.getVeiculo().getMatricula())) {
             pedidos = this.listaDeEspera.get(p.getVeiculo().getMatricula());
-            p.setNumeroPedido(pedidos.size());
         }
+        tam = pedidos.size();
+        p.setNumeroPedido(tam);
         pedidos.add(p);
         this.listaDeEspera.put(p.getVeiculo().getMatricula(),pedidos);
+
+        return tam;
     }
 
     public void validarAluguer(String matricula, int estado){
@@ -44,5 +48,9 @@ public class Proprietario extends User{
 
     public Proprietario clone(){
         return new Proprietario(this);
+    }
+
+    public void insereLista(String matricula, List<Pedido> pedidos) {
+        this.listaDeEspera.put(matricula, pedidos);
     }
 }
