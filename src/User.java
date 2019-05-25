@@ -96,7 +96,9 @@ public class User {
     }
 
 	public List<Aluguer> getHistorico() {
-		return historico;
+		List<Aluguer> lista = new ArrayList<>();
+
+		return lista;
 	}
 
     public void addAluguer(Aluguer alug) {

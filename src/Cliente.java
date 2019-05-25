@@ -50,4 +50,8 @@ public class Cliente extends User{
 	public Cliente clone() {
 		return new Cliente(this);
 	}
+
+    public void setLocalizacao(Ponto<Double> destino) {
+		this.localizacao = destino;
+    }
 }

@@ -30,7 +30,7 @@ public class UmCarroJaModel {
         this.clientesMap = new HashMap<>();
         veiculosMap = new HashMap<>();
 
-        List<String> input = lerAllLines("LogsUCJ.bak");
+        List<String> input = lerAllLines("logsPOO_carregamentoInicial.bak");
         String[] divisao;
         String[] argumentos;
 
@@ -51,27 +51,63 @@ public class UmCarroJaModel {
                                     insereAluguer(argumentos);
                                     break;
                 case "Classificar": argumentos = divisao[1].split(",");
-                                    if (this.proprietarioMap.containsKey(argumentos[0])) {
-                                        Proprietario p = this.proprietarioMap.get(argumentos[0]);
-                                        p.classificar(Integer.parseInt(argumentos[1]));
-                                        this.proprietarioMap.put(p.getNif(), p);
-                                    }else if(this.clientesMap.containsKey(argumentos[0])) {
-                                        Cliente c = this.clientesMap.get(argumentos[0]);
-                                        c.classificar(Integer.parseInt(argumentos[1]));
-                                        this.clientesMap.put(c.getNif(), c);
-                                    }else{
-                                        Veiculo v = this.veiculosMap.get(argumentos[0]);
-                                        v.classificar(Integer.parseInt(argumentos[1]));
-                                        this.veiculosMap.put(v.getMatricula(), v);
-                                    }
+                                    classifica(argumentos);
                                     break;
                 default:            break;
             }
         }
     }
 
-    private void insereAluguer(String[] argumentos) {
+    private void classifica(String[] argumentos){
+        if (this.proprietarioMap.containsKey(argumentos[0])) {
+            Proprietario p = this.proprietarioMap.get(argumentos[0]);
+            p.classificar(Integer.parseInt(argumentos[1]));
+            this.proprietarioMap.put(p.getNif(), p);
+        }else if(this.clientesMap.containsKey(argumentos[0])) {
+            Cliente c = this.clientesMap.get(argumentos[0]);
+            c.classificar(Integer.parseInt(argumentos[1]));
+            this.clientesMap.put(c.getNif(), c);
+        }else{
+            Veiculo v = this.veiculosMap.get(argumentos[0]);
+            v.classificar(Integer.parseInt(argumentos[1]));
+            this.veiculosMap.put(v.getMatricula(), v);
+        }
+    }
 
+    public void classifica(String nif, int classificacao){
+        if (this.proprietarioMap.containsKey(nif)){
+            Proprietario p = this.proprietarioMap.get(nif);
+            p.classificar(classificacao);
+            this.proprietarioMap.put(p.getNif(), p);
+        }else if(this.clientesMap.containsKey(nif)) {
+            Cliente c = this.clientesMap.get(nif);
+            c.classificar(classificacao);
+            this.clientesMap.put(c.getNif(), c);
+        }else{
+            Veiculo v = this.veiculosMap.get(nif);
+            v.classificar(classificacao);
+            this.veiculosMap.put(v.getMatricula(), v);
+        }
+    }
+
+    private void insereAluguer(String[] argumentos) {
+        String preferencia = argumentos[4];
+        Veiculo v = null;
+
+        if(preferencia.equals("MaisPerto")){
+            v = getVeiculoMaisProximo(argumentos[0], argumentos[3]);
+        }else if(preferencia.equals("MaisBarato")){
+            v = getVeiculoMaisBarato(argumentos[3]);
+        }
+
+        if(v != null) {
+            out.println("pedido aceite");
+            Pedido p = new Pedido(clientesMap.get(argumentos[0]), v,
+                    new Ponto<>(Double.parseDouble(argumentos[1]), Double.parseDouble(argumentos[2])));
+            pedidoAceite(p);
+        }
+        else
+            out.println("pedido recusado");
     }
 
 
@@ -143,7 +179,7 @@ public class UmCarroJaModel {
         Set<String> matriculas = this.veiculosMap.keySet();
         for(String s : matriculas){
             Veiculo v = this.veiculosMap.get(s);
-            if (v.getTipo() == tipo)
+            if (v.getTipo().equals(tipo))
                 carros.add(v);
         }
         return carros;
@@ -179,11 +215,42 @@ public class UmCarroJaModel {
         return maisPerto;
     }
 
-    public Veiculo getVeiculoMaisBarato(String nifCliente) {
+    public Veiculo getVeiculoMaisProximo(String nifCliente, String tipo){
+        List<Veiculo> veiculos = getListaVeiculos(tipo);
+        Cliente c = getCliente(nifCliente);
+        Veiculo maisPerto = null;
+        for (Veiculo v: veiculos) {
+            if(maisPerto == null &&
+                    v.getDisponivel())
+                maisPerto = v;
+            else if(maisPerto != null &&
+                    c.getLocalizacao().distanceTo(maisPerto.getLocalizacao()) >
+                            c.getLocalizacao().distanceTo(v.getLocalizacao()) &&
+                    v.getDisponivel())
+                maisPerto = v;
+        }
+        return maisPerto;
+    }
+
+    public Veiculo getVeiculoMaisBarato() {
         Set<String> matriculas = getMatriculas();
         Veiculo maisBarato = null;
         for (String matricula : matriculas) {
             Veiculo v = getVeiculo(matricula);
+            if (maisBarato == null && v.getDisponivel())
+                maisBarato = v;
+            else if (maisBarato != null &&
+                    v.getPrecoKm() < maisBarato.getPrecoKm() &&
+                    v.getDisponivel())
+                maisBarato = v;
+        }
+        return maisBarato;
+    }
+
+    private Veiculo getVeiculoMaisBarato(String tipo) {
+        List<Veiculo> veiculos = getListaVeiculos(tipo);
+        Veiculo maisBarato = null;
+        for (Veiculo v : veiculos) {
             if (maisBarato == null && v.getDisponivel())
                 maisBarato = v;
             else if (maisBarato != null &&
@@ -252,20 +319,26 @@ public class UmCarroJaModel {
 
     public void pedidoAceite(Pedido p) {
         Proprietario prop = this.proprietarioMap.get(p.getVeiculo().getNifProp());
-        List<Pedido> pedidos = prop.getListaDeEspera().get(p.getVeiculo().getMatricula());
-        pedidos.remove(p);
-        prop.insereLista(p.getVeiculo().getMatricula(), pedidos);
+        List<Pedido> pedidos = prop.getListaDeEspera().get(p.getVeiculo().getMatricula()); //lista de pedidos do prop
+
+        if(pedidos != null){
+            pedidos.remove(p); //remove o pedido em questão
+            prop.insereLista(p.getVeiculo().getMatricula(), pedidos); //insere no proprietario a lista sem o pedido
+        }
+
 
         Veiculo veiculo = p.getVeiculo();
-        Aluguer alug = veiculo.alugar(p);
+        Aluguer alug = veiculo.alugar(p); //aluga o veiculo, adicionando o historico
         this.veiculosMap.put(veiculo.getMatricula(), veiculo);
 
         prop.addAluguer(alug);
         this.proprietarioMap.put(prop.getNif(), prop);
 
         Cliente cli = p.getCliente();
+        cli.setLocalizacao(p.getDestino());
         cli.addAluguer(alug);
         this.clientesMap.put(cli.getNif(), cli);
+        out.println("done");
     }
 
 }

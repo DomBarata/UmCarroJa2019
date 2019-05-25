@@ -156,7 +156,7 @@ public class UmCarroJaController {
                                 this.model.getCliente(nif).getLocalizacao()
                         ));
                         break;
-                case 2: Veiculo maisBar = this.model.getVeiculoMaisBarato(nif);
+                case 2: Veiculo maisBar = this.model.getVeiculoMaisBarato();
                         this.view.printVeiculo(maisBar,
                         maisBar.getLocalizacao().distanceTo(
                                 this.model.getCliente(nif).getLocalizacao()
@@ -165,6 +165,7 @@ public class UmCarroJaController {
                 case 3:
                         double distancia = this.view.getDistancia();
                         Veiculo maisBaratDentroDist = this.model.getVeiculoMaisBarato(nif,distancia);
+                        //confirmar que o veiculo nao é null
                         this.view.printVeiculo(maisBaratDentroDist,
                             maisBaratDentroDist.getLocalizacao().distanceTo(
                                     this.model.getCliente(nif).getLocalizacao()
@@ -189,7 +190,9 @@ public class UmCarroJaController {
                             this.model.pedidoRejeitado(p);
                         }else if(p.getEstado() == 1){
                             this.view.pedidoAceite();
-                            this.model.pedidoAceite(p); //efetuar aluguer
+                            this.model.pedidoAceite(p); //efetua aluguer
+                            this.model.classifica(p.getVeiculo().getNifProp(), this.view.getAvaliacaoProprietario());
+                            this.model.classifica(p.getVeiculo().getMatricula(), this.view.getAvaliacaoVeiculo());
                         }else{
                             this.view.pedidoPendente();
                         }

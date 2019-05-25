@@ -231,8 +231,7 @@ public class UmCarroJaView {
             System.in.read();
         }catch (IOException exc){out.println(exc);}
 
-
-}
+    }
 
     private void printAlugueres(List<Aluguer> historico) {
         int i = 0;
@@ -316,5 +315,26 @@ public class UmCarroJaView {
 
     public void pedidoPendente() {
         out.println("O seu pedido ainda está pendente");
+    }
+
+    public int getAvaliacaoVeiculo() {
+        out.println("O que achou do veículo? (0-100)");
+        input = new Scanner(System.in);
+
+        return input.nextInt();
+    }
+
+    public int getAvaliacaoProprietario() {
+        out.println("O que achou do proprietário? (0-100)");
+        input = new Scanner(System.in);
+
+        return input.nextInt();
+    }
+
+    public int getAvaliacaoCliente() {
+        out.println("O que achou do cliente? (0-100)");
+        input = new Scanner(System.in);
+
+        return input.nextInt();
     }
 }
