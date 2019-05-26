@@ -1,8 +1,8 @@
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-public class Veiculo {
+public class Veiculo implements Serializable {
 	private final String tipo;
 	private String marca;
 	private String matricula;
@@ -159,13 +159,17 @@ public class Veiculo {
 		return this.disponivel;
 	}
 
-	public void setDisponivel(boolean disponivel) {
-		this.disponivel = disponivel;
+	public void setDisponivel() {
+		this.disponivel = true;
+	}
+
+	public void setIndisponive(){
+		this.disponivel = false;
 	}
 
 	public Aluguer alugar(Pedido p) {
 		Aluguer aluguer = new Aluguer(p.getVeiculo(),
-				p.getCliente(), p.getCliente().getLocalizacao(),
+				p.getCliente(), p.getVeiculo().getLocalizacao(),
 				p.getDestino());
 		this.autonomia -= localizacao.distanceTo(p.getDestino());
 		this.localizacao = p.getDestino();
@@ -173,5 +177,20 @@ public class Veiculo {
 		this.historico.add(aluguer);
 
 		return aluguer;
+	}
+
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		sb.append("NovoCarro:")
+				.append(this.tipo).append(",")
+				.append(this.marca).append(",")
+				.append(this.matricula).append(",")
+				.append(this.nifProp).append(",")
+				.append(this.velMedia).append(",")
+				.append(this.precoKm).append(",")
+				.append(this.consumoKm).append(",")
+				.append(this.autonomia).append(",")
+				.append(this.localizacao);
+		return sb.toString();
 	}
 }

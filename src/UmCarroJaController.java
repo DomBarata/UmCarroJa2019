@@ -1,5 +1,5 @@
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import static java.lang.System.exit;
 import static java.lang.System.out;
@@ -19,16 +19,17 @@ public class UmCarroJaController {
     }
 
     public void start() {
-        String password = "hello";
+        String password;
         int errado = 0;
-        while (true) {
+        boolean flag = true;
+        while (flag) {
             this.nif = this.view.userLogin();
             switch (this.model.existeNif(nif)) {
                 case 1: while (errado < 5) {
                             password = this.view.passwordLogin();
                             if (this.model.checkProprietarioPassword(nif, password)){
-                                password = null;
                                 proprietarioControl();
+                                flag = false;
                             }else{
                                 errado++;
                                 this.view.wrongPassword(errado);
@@ -42,8 +43,8 @@ public class UmCarroJaController {
                 case 2: while (errado < 5) {
                             password = this.view.passwordLogin();
                             if (this.model.checkClientePassword(nif, password)) {
-                                password = null;
                                 clienteControl();
+                                flag = false;
                             }else{
                                 errado++;
                                 this.view.wrongPassword(errado);
@@ -58,14 +59,14 @@ public class UmCarroJaController {
                 case 0: int op = this.view.wrongUser();
                         if (op == 1)
                         {
-                            model.inserirProprietario(new Proprietario(this.view.inserirNovoUser(nif)));
+                            model.inserirProprietario(new Proprietario(this.view.inserirNovoUser(nif).toArray(String[]::new)));
                         }else if(op == 2){
-                            String[] dados = this.view.inserirNovoUser(nif);
+                            List<String> dados = this.view.inserirNovoUser(nif);
                             String[] local = this.view.localizacao();
 
-                            dados[7] = local[0];
-                            dados[8] = local[1];
-                            model.inserirCliente(new Cliente(dados));
+                            dados.add(local[0]);
+                            dados.add(local[1]);
+                            model.inserirCliente(new Cliente(dados.toArray(String[]::new)));
                         }
                         break;
             }
@@ -86,27 +87,41 @@ public class UmCarroJaController {
                         break;
                 case 2: String matricula = this.view.getMatricula();
                         Veiculo v = this.model.getVeiculo(matricula, this.nif);
-                        if(v.getDisponivel())
-                            out.println("Esse veículo já se encontra disponível");
-                        else{
-                            v.setDisponivel(true);
-                            this.model.inserirVeiculo(v);
+                        if(v != null) {
+                            if (v.getDisponivel())
+                                out.println("Esse veículo já se encontra disponível");
+                            else {
+                                v.setDisponivel();
+                                this.model.inserirVeiculo(v);
+                            }
+                        }
+                        else {
+                            this.view.veiculoNaoExistente(matricula);
                         }
                         break;
                 case 3: abastecimento();
                         break;
                 case 4: String mat = this.view.getMatricula();
                         Veiculo vei = this.model.getVeiculo(mat, this.nif);
-                        double precoKm = this.view.getPrecoKm();
-                        vei.setPrecoKm(precoKm);
-                        this.model.inserirVeiculo(vei);
+                        if(vei!=null) {
+                            double precoKm = this.view.getPrecoKm();
+                            vei.setPrecoKm(precoKm);
+                            this.model.inserirVeiculo(vei);
+                        }
+                        else this.view.veiculoNaoExistente(mat);
                         break;
-                case 5: this.view.printClientesPendentes(this.model.getProprietario(nif).getListaDeEspera());
+                case 5: Map<String, List<Pedido>> lista = this.model.getProprietario(nif).getListaDeEspera();
+                        if(!lista.isEmpty())
+                            this.view.printClientesPendentes(lista);
+                        else
+                            this.view.naoHaPedidos();
                         break;
-                case 6: Proprietario p = (Proprietario) this.model.getUser(nif);
+                case 6: User p = this.model.getUser(nif);
                         List<Aluguer> hist = p.getHistorico();
-                        Aluguer aluguer= hist.get(0);
-                        out.println(aluguer.getPrecoViagem() + "€");
+                        if(!hist.isEmpty()) {
+                            Aluguer aluguer = hist.get(0);
+                            out.println(aluguer.getPrecoViagem() + "€");
+                        }else this.view.naoHaPedidos();
                         break;
                 case 7: String matr = this.view.getMatricula();
                         Proprietario prop = this.model.getProprietario(nif);
@@ -116,7 +131,11 @@ public class UmCarroJaController {
                 case 8: this.view.getPerfil(this.model.getProprietario(nif));
                         break;
                 case 9: String nifCheck = this.view.getNif();
-                        this.view.getPerfil(this.model.getCliente(nifCheck));
+                        Cliente c = this.model.getCliente(nifCheck);
+                        if(c!=null)
+                            this.view.getPerfil(c);
+                        else
+                            this.view.userNaoExiste(nifCheck);
                         break;
                 case 0: break;
             }
@@ -125,24 +144,27 @@ public class UmCarroJaController {
     }
 
     private void abastecimento() {
-        Veiculo v = this.model.getVeiculo(view.getMatricula(), this.nif);
-        int autonomia = v.getAutonomia();
-        double consumo = v.getConsumoKm();
-        double total;
-        double op = this.view.abastecimento(v.getTipo(), precoCombusivel(v.getTipo()), v.getAutonomia());
-
-        if (op == 0) {
-        } else if (op == 1) {
-            total = (((1000 - autonomia) * consumo) / 100) * precoCombusivel(v.getTipo());
-            v.setAutonomia(1000);
-            this.model.inserirVeiculo(v);
-            out.println("O veiculo ficou com uma autonomia de " + v.getAutonomia() + "Kms, e gastou " + total + "EUR");
-        } else {
-            autonomia = (int) (op / precoCombusivel(v.getTipo()) * 100 / consumo);
-            v.setAutonomia(autonomia);
-            this.model.inserirVeiculo(v);
-            out.println("O veiculo ficou com uma autonoma de " + autonomia + "Kms");
+        String matricula = view.getMatricula();
+        Veiculo v = this.model.getVeiculo(matricula, this.nif);
+        if (v != null) {
+            int autonomia = v.getAutonomia();
+            double consumo = v.getConsumoKm();
+            double total;
+            double op = this.view.abastecimento(v.getTipo(), precoCombusivel(v.getTipo()), v.getAutonomia());
+            if (op == 0) {
+            } else if (op == 1) {
+                total = (((1000 - autonomia) * consumo) / 100) * precoCombusivel(v.getTipo());
+                v.setAutonomia(1000);
+                this.model.inserirVeiculo(v);
+                out.println("O veiculo ficou com uma autonomia de " + v.getAutonomia() + "Kms, e gastou " + total + "EUR");
+            } else {
+                autonomia = (int) (op / precoCombusivel(v.getTipo()) * 100 / consumo);
+                v.setAutonomia(autonomia);
+                this.model.inserirVeiculo(v);
+                out.println("O veiculo ficou com uma autonoma de " + autonomia + "Kms");
+            }
         }
+        else view.veiculoNaoExistente(matricula);
     }
 
     private void clienteControl() {
@@ -151,25 +173,29 @@ public class UmCarroJaController {
             op = this.view.clienteMenu();
             switch (op) {
                 case 1: Veiculo maisProx = this.model.getVeiculoMaisProximo(nif);
-                        this.view.printVeiculo(maisProx,
-                        maisProx.getLocalizacao().distanceTo(
-                                this.model.getCliente(nif).getLocalizacao()
-                        ));
+                        if (maisProx != null) {
+                            this.view.printVeiculo(maisProx,
+                                    maisProx.getLocalizacao().distanceTo(
+                                            this.model.getCliente(nif).getLocalizacao()
+                                    ));
+                        }
                         break;
                 case 2: Veiculo maisBar = this.model.getVeiculoMaisBarato();
-                        this.view.printVeiculo(maisBar,
-                        maisBar.getLocalizacao().distanceTo(
-                                this.model.getCliente(nif).getLocalizacao()
-                        ));
+                        if(maisBar != null) {
+                            this.view.printVeiculo(maisBar,
+                                    maisBar.getLocalizacao().distanceTo(
+                                            this.model.getCliente(nif).getLocalizacao()
+                                    ));
+                        }
                         break;
-                case 3:
-                        double distancia = this.view.getDistancia();
+                case 3: double distancia = this.view.getDistancia();
                         Veiculo maisBaratDentroDist = this.model.getVeiculoMaisBarato(nif,distancia);
-                        //confirmar que o veiculo nao é null
-                        this.view.printVeiculo(maisBaratDentroDist,
-                            maisBaratDentroDist.getLocalizacao().distanceTo(
-                                    this.model.getCliente(nif).getLocalizacao()
-                            ));
+                        if(maisBaratDentroDist != null) {
+                            this.view.printVeiculo(maisBaratDentroDist,
+                                    maisBaratDentroDist.getLocalizacao().distanceTo(
+                                            this.model.getCliente(nif).getLocalizacao()
+                                    ));
+                        }
                         break;
                 case 4: String tipo = this.view.getTipo();
                         List<Veiculo> listaDeCarros = this.model.getListaVeiculos(tipo);
@@ -185,7 +211,7 @@ public class UmCarroJaController {
                         out.println("Está na posição " + queue + " na lista de espera");
                         break;
                 case 7: Pedido p = this.model.getPedido(nif);
-                        if(p.getEstado() == 2)                        {
+                        if(p.getEstado() == 2) {
                             this.view.pedidoRejeitado();
                             this.model.pedidoRejeitado(p);
                         }else if(p.getEstado() == 1){
@@ -193,22 +219,24 @@ public class UmCarroJaController {
                             this.model.pedidoAceite(p); //efetua aluguer
                             this.model.classifica(p.getVeiculo().getNifProp(), this.view.getAvaliacaoProprietario());
                             this.model.classifica(p.getVeiculo().getMatricula(), this.view.getAvaliacaoVeiculo());
-                        }else{
+                        }else if(p.getEstado() == 0){
                             this.view.pedidoPendente();
+                        }else{
+                            this.view.naoHaPedidos();
                         }
                         break;
                 case 8: this.view.getPerfil(this.model.getCliente(nif));
                         break;
                 case 9: String nifCheck = this.view.getNif();
-                        this.view.getPerfil(this.model.getProprietario(nifCheck));
+                        Proprietario pro = this.model.getProprietario(nifCheck);
+                        if(pro != null)
+                            this.view.getPerfil(pro);
+                        else
+                            this.view.userNaoExiste(nifCheck);
                         break;
                 case 0: break;
             }
-
-        }while (op != 0) ;
-    }
-
-    private void exitSaveStatus() {
+        }while (op != 0);
     }
 
     private double precoCombusivel(String str){
@@ -225,5 +253,6 @@ public class UmCarroJaController {
         return ret;
     }
 
-
+    public void saveStatus() {
+    }
 }

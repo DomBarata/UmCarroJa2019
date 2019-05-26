@@ -1,4 +1,6 @@
-public class Pedido {
+import java.io.Serializable;
+
+public class Pedido implements Serializable {
     private int estado; //0 pendente, 1 aceite, 2 rejeitado
     private int numeroPedido;
     private Cliente cliente;
@@ -54,5 +56,17 @@ public class Pedido {
 
     public Pedido clone(){
         return new Pedido(this);
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("Pedido:")
+                .append(this.veiculo.getNifProp()).append(",")
+                .append(this.estado).append(",")
+                .append(this.numeroPedido).append(",")
+                .append(this.cliente.getNif()).append(",")
+                .append(this.veiculo.getMatricula()).append(",")
+                .append(this.destino);
+        return sb.toString();
     }
 }

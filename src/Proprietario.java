@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Proprietario extends User{
+public class Proprietario extends User implements Serializable {
     private Map<String,List<Pedido>> listaDeEspera;
 
     public Proprietario(String nome, String password, String nif,
@@ -52,5 +53,16 @@ public class Proprietario extends User{
 
     public void insereLista(String matricula, List<Pedido> pedidos) {
         this.listaDeEspera.put(matricula, pedidos);
+    }
+
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("NovoProp:").append(super.getNome()).append(",")
+                .append(super.getPassword()).append(",")
+                .append(super.getNif()).append(",")
+                .append(super.getEmail()).append(",")
+                .append(super.getMorada()).append(",")
+                .append(super.getNascimento());
+        return sb.toString();
     }
 }

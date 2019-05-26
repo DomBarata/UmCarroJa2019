@@ -3,8 +3,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-
-import static java.lang.System.in;
 import static java.lang.System.out;
 
 public class UmCarroJaView {
@@ -44,15 +42,15 @@ public class UmCarroJaView {
     public void wrongPassword(int i){
             out.println("A password inserida está errada!");
             out.println("\tTem mais " + (5 - i) + " tentativas");
-
     }
 
     public void wrongPassword() {
         out.println("Inseriu a password errada demasiadas vezes");
         out.println("Boa sorte para um proxima ^^");
+        new wait();
     }
 
-    public String[] inserirNovoUser(String nif){
+    public List<String> inserirNovoUser(String nif){
         List<String> dados = new ArrayList<>();
         boolean flag = true;
 
@@ -81,7 +79,7 @@ public class UmCarroJaView {
         dados.add(input.next());
         out.println("Insira a sua data de nascimento (DD-MM-AAAA)");
         input = new Scanner(System.in);
-        String[] s = input.next().split("\\-");
+        String[] s = input.next().split("-");
         dados.add(s[0]);
         dados.add(s[1]);
         dados.add(s[2]);
@@ -90,20 +88,14 @@ public class UmCarroJaView {
         for(String str : dados)
             out.println(str);
 
-        return dados.toArray(String[]::new);
+        return dados;
     }
 
     public String[] localizacao(){
-        String[] dados = new String[2];
-
-        out.println("Insira as suas coodenadas em X");
+        out.println("Insira as suas coodenadas (X,Y)");
         input = new Scanner(System.in);
-        dados[0] = input.next();
-        out.println("Insira as suas coodenadas em Y");
-        input = new Scanner(System.in);
-        dados[1] = input.next();
 
-        return dados;
+        return input.next().split(",");
     }
 
     public int proprietarioMenu() {
@@ -176,8 +168,9 @@ public class UmCarroJaView {
 
     public Ponto<Double> getLocalizacao() {
         out.println("Insira as coordenadas do carro (X,Y)");
-        Scanner scanner = new Scanner(System.in).useDelimiter(",");
-        return new Ponto<>(scanner.nextDouble(), scanner.nextDouble());
+        Scanner scanner = new Scanner(System.in);
+        String[] pt = scanner.next().split(",");
+        return new Ponto<>(Double.parseDouble(pt[0]), Double.parseDouble(pt[1]));
     }
 
     public double abastecimento(String tipo, double precoCombustivel, double autonomia) {
@@ -206,6 +199,7 @@ public class UmCarroJaView {
             }
             out.println();
         }
+        new wait();
     }
 
     public int validarAluguer() {
@@ -225,12 +219,9 @@ public class UmCarroJaView {
         else
             out.println("e está classificado em " + u.getClassificacao() + "/100");
         out.print("Prima ENTER para ver histório de alugueres...");
-        try {
-            System.in.read();
+            new wait();
             printAlugueres(u.getHistorico());
-            System.in.read();
-        }catch (IOException exc){out.println(exc);}
-
+            new wait();
     }
 
     private void printAlugueres(List<Aluguer> historico) {
@@ -256,7 +247,7 @@ public class UmCarroJaView {
         out.println("1 - Ver o veículo mais próximo");
         out.println("2 - Ver o veículo mais barato");
         out.println("3 - Ver o veículo mais barato dentro de uma determinada distância");
-        out.println("4 - Ver os carros de um determinado tipo");
+        out.println("4 - Ver os veículos de um determinado tipo");
         out.println("5 - Ver os carros com uma determinada autonomia mínima");
         out.println("6 - Efetuar pedido de aluguer");
         out.println("7 - Verificar pedido de aluguer");
@@ -295,26 +286,31 @@ public class UmCarroJaView {
             printVeiculo(v, v.getLocalizacao().distanceTo(clienteLocalizacao));
             out.println("-----------------------------");
         }
-        input = new Scanner(System.in);
+        if(listaDeCarros.isEmpty()) out.println("Não existem carros desse tipo");
+        new wait();
     }
 
     public Ponto<Double> getDestino() {
         out.println("Insira as coordenadas do destino (X,Y)");
-        Scanner scanner = new Scanner(System.in).useDelimiter(",");
-        return new Ponto<>(scanner.nextDouble(), scanner.nextDouble());
+        Scanner scanner = new Scanner(System.in);
+        String[] pt = scanner.next().split(",");
+        return new Ponto<>(Double.parseDouble(pt[0]), Double.parseDouble(pt[1]));
     }
 
     public void pedidoRejeitado() {
         out.println("O seu pedido foi rejeitado");
+        new wait();
     }
 
     public void pedidoAceite() {
         out.println("O seu pedido foi aceite");
         out.println("O aluguer foi feito com sucesso e a viajem realizada");
+        new wait();
     }
 
     public void pedidoPendente() {
         out.println("O seu pedido ainda está pendente");
+        new wait();
     }
 
     public int getAvaliacaoVeiculo() {
@@ -336,5 +332,22 @@ public class UmCarroJaView {
         input = new Scanner(System.in);
 
         return input.nextInt();
+    }
+
+    public void naoHaPedidos() {
+        out.println("--------------------------");
+        out.println("Não tem pedidos");
+        out.println("--------------------------");
+        new wait();
+    }
+
+    public void veiculoNaoExistente(String matricula) {
+    out.println("O veículo com a matrícula " + matricula + " não existe ou não lhe pertence");
+    new wait();
+    }
+
+    public void userNaoExiste(String nif) {
+    out.println("O user com o NIF " + nif + " não existe");
+    new wait();
     }
 }

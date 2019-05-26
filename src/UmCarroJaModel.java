@@ -1,11 +1,12 @@
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
 import static java.lang.System.out;
 
-public class UmCarroJaModel {
+public class UmCarroJaModel implements Serializable {
 
     //Map Key - NIF, Value - Prop
     private Map<String, Proprietario> proprietarioMap;
@@ -14,6 +15,11 @@ public class UmCarroJaModel {
     //Map Key - Matricula, Value - Veiculo
     private Map<String, Veiculo> veiculosMap;
 
+    public UmCarroJaModel(){
+        this.proprietarioMap = new HashMap<>();
+        this.clientesMap = new HashMap<>();
+        veiculosMap = new HashMap<>();
+    }
 
     private static List<String> lerAllLines(String fichtxt) {
         List<String> linhas = new ArrayList<>();
@@ -26,10 +32,6 @@ public class UmCarroJaModel {
 
     public void createData()
     {
-        this.proprietarioMap = new HashMap<>();
-        this.clientesMap = new HashMap<>();
-        veiculosMap = new HashMap<>();
-
         List<String> input = lerAllLines("logsPOO_carregamentoInicial.bak");
         String[] divisao;
         String[] argumentos;
@@ -101,20 +103,22 @@ public class UmCarroJaModel {
         }
 
         if(v != null) {
-            out.println("pedido aceite");
             Pedido p = new Pedido(clientesMap.get(argumentos[0]), v,
                     new Ponto<>(Double.parseDouble(argumentos[1]), Double.parseDouble(argumentos[2])));
             pedidoAceite(p);
         }
-        else
-            out.println("pedido recusado");
     }
 
 
     public Veiculo getVeiculo(String matricula, String nif) {
         Veiculo v = this.veiculosMap.get(matricula);
 
-        return (v.getNifProp().equals(nif)?v.clone():null);
+        if(v == null)
+            return v;
+        else if(v.getNifProp().equals(nif))
+            return v.clone();
+        else
+            return null;
     }
 
     public Veiculo getVeiculo(String matricula) {
@@ -124,8 +128,8 @@ public class UmCarroJaModel {
 
 
     public void inserirVeiculo(Veiculo v) {
-        this.veiculosMap.put(v.getMatricula(), v);
-
+        if(!veiculosMap.containsKey(v.getMatricula()))
+            this.veiculosMap.put(v.getMatricula(), v);
     }
 
     public int existeNif(String nif) {
@@ -163,11 +167,11 @@ public class UmCarroJaModel {
     }
 
     public Proprietario getProprietario(String nif) {
-        return this.proprietarioMap.get(nif).clone();
+        return this.proprietarioMap.get(nif);
     }
 
     public Cliente getCliente(String nif) {
-        return this.clientesMap.get(nif).clone();
+       return this.clientesMap.get(nif);
     }
 
     public Set<String> getMatriculas(){
@@ -293,7 +297,7 @@ public class UmCarroJaModel {
     public Pedido getPedido(String nif) {
         Cliente cliente = this.clientesMap.get(nif);
         Set<String> prop = this.proprietarioMap.keySet();
-        Pedido pedido = new Pedido();
+        Pedido pedido = null;
         for(String s : prop){
             Proprietario proprietario = this.proprietarioMap.get(s);
             Map<String, List<Pedido>> pedidos = proprietario.getListaDeEspera();
@@ -302,11 +306,11 @@ public class UmCarroJaModel {
                 List<Pedido> espera = pedidos.get(str);
                 for(Pedido p : espera){
                     if (p.getCliente().equals(cliente))
-                        pedido = p;
+                        pedido = p.clone();
                 }
             }
         }
-        return pedido.clone();
+        return pedido;
     }
 
     public void pedidoRejeitado(Pedido p) {
@@ -338,7 +342,6 @@ public class UmCarroJaModel {
         cli.setLocalizacao(p.getDestino());
         cli.addAluguer(alug);
         this.clientesMap.put(cli.getNif(), cli);
-        out.println("done");
     }
 
 }

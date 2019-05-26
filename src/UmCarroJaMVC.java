@@ -1,6 +1,8 @@
+import java.io.Serializable;
+
 import static java.lang.System.out;
 
-public class UmCarroJaMVC {
+public class UmCarroJaMVC implements Serializable {
     public static void main(String[] args) {
 
         UmCarroJaModel model = new UmCarroJaModel();
@@ -11,6 +13,7 @@ public class UmCarroJaMVC {
         control.setModel(model);
         control.setView(view);
         control.start();
+        control.saveStatus();
         System.exit(0);
     }
 }

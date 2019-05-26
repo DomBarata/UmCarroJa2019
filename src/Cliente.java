@@ -1,10 +1,7 @@
+import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
 
-public class Cliente extends User{
+public class Cliente extends User implements Serializable {
 	private Ponto<Double> localizacao;
 
 	public Cliente(String nome, String password, String nif, String email,
@@ -30,14 +27,15 @@ public class Cliente extends User{
 		return this.localizacao;
 	}
 
-	public String toString() {
+	public String toString(){
 		StringBuilder sb = new StringBuilder();
 		sb.append("NovoCliente:").append(super.getNome()).append(",")
-				.append(super.getNif())
-				.append(",").append(super.getEmail()).append(",")
-				.append(super.getMorada())
-				.append(",").append(localizacao.getX())
-				.append(",").append(localizacao.getY());
+				.append(super.getPassword()).append(",")
+				.append(super.getNif()).append(",")
+				.append(super.getEmail()).append(",")
+				.append(super.getMorada()).append(",")
+				.append(super.getNascimento()).append(",")
+				.append(this.localizacao);
 		return sb.toString();
 	}
 

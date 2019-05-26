@@ -1,8 +1,9 @@
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User {
+public class User implements Serializable {
 	private String nome;
 	private String password;
 	private String nif;
@@ -97,6 +98,9 @@ public class User {
 
 	public List<Aluguer> getHistorico() {
 		List<Aluguer> lista = new ArrayList<>();
+		for (Aluguer a: this.historico) {
+			lista.add(a);
+		}
 
 		return lista;
 	}

@@ -1,4 +1,6 @@
-public class Aluguer {
+import java.io.Serializable;
+
+public class Aluguer implements Serializable {
     private Veiculo veiculoUsado;
     private User userAlugado;
     private Ponto<Double> inicioViagem;
@@ -49,7 +51,11 @@ public class Aluguer {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-
-        return sb.append("").toString();
+        sb.append("Alugado:")
+                .append(this.veiculoUsado.getMatricula()).append(",")
+                .append(this.userAlugado.getNif()).append(",")
+                .append(this.inicioViagem).append(",")
+                .append(this.fimViagem);
+        return sb.toString();
     }
 }
