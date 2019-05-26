@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="35.50000000000006" y="504.0">wait</node>
+    <node x="486.7576298701298" y="504.0">Proprietario</node>
+    <node x="359.39692232887876" y="0.0">User</node>
+    <node x="253.69692232887894" y="226.0">Aluguer</node>
+    <node x="257.87188248949116" y="504.0">Veiculo</node>
+    <node x="250.61329663090527" y="766.0">UmCarroJaController</node>
+    <node x="522.7950967752054" y="640.0">UmCarroJaModel</node>
+    <node x="275.61329663090527" y="852.0">UmCarroJaMVC</node>
+    <node x="404.89692232887876" y="322.0">Cliente</node>
+    <node x="344.2255252838948" y="408.0">Pedido</node>
+    <node x="237.69692232887894" y="0.0">Ponto</node>
+    <node x="47.79825255662223" y="640.0">UmCarroJaView</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Proprietario" target="User">
+      <point x="48.0" y="-13.0" />
+      <point x="598.7576298701298" y="484.0" />
+      <point x="592.7950967752054" y="484.0" />
+      <point x="592.7950967752054" y="76.0" />
+      <point x="419.85146778342425" y="76.0" />
+      <point x="25.454545454545496" y="13.0" />
+    </edge>
+    <edge source="Veiculo" target="Pedido">
+      <point x="25.090909090909122" y="-13.0" />
+      <point x="328.9627915804003" y="464.0" />
+      <point x="348.94774750611697" y="464.0" />
+      <point x="-37.77777777777783" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Proprietario">
+      <point x="0.0" y="-13.0" />
+      <point x="593.7950967752054" y="550.0" />
+      <point x="601.9576298701298" y="550.0" />
+      <point x="51.200000000000045" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Pedido">
+      <point x="6.357142857142662" y="-13.0" />
+      <point x="345.97043948804793" y="686.0" />
+      <point x="386.7255252838948" y="686.0" />
+      <point x="0.0" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="Ponto">
+      <point x="-57.85714285714289" y="-13.0" />
+      <point x="57.44110969947934" y="620.0" />
+      <point x="25.0" y="620.0" />
+      <point x="25.0" y="96.0" />
+      <point x="240.29692232887885" y="96.0" />
+      <point x="-36.40000000000009" y="13.0" />
+    </edge>
+    <edge source="Cliente" target="Ponto">
+      <point x="-23.0" y="-13.0" />
+      <point x="427.89692232887876" y="292.0" />
+      <point x="372.39692232887876" y="292.0" />
+      <point x="372.39692232887876" y="136.0" />
+      <point x="292.29692232887885" y="136.0" />
+      <point x="15.599999999999909" y="13.0" />
+    </edge>
+    <edge source="Pedido" target="Veiculo">
+      <point x="-28.333333333333258" y="13.0" />
+      <point x="358.39219195056154" y="474.0" />
+      <point x="337.32642794403665" y="474.0" />
+      <point x="33.454545454545496" y="-13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Aluguer">
+      <point x="37.866666666666674" y="-13.0" />
+      <point x="631.6617634418719" y="590.0" />
+      <point x="653.6576298701298" y="590.0" />
+      <point x="653.6576298701298" y="272.0" />
+      <point x="340.58581121776785" y="272.0" />
+      <point x="40.888888888888914" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaMVC" target="UmCarroJaController">
+      <point x="10.666666666666515" y="-13.0" />
+      <point x="350.2799632975718" y="812.0" />
+      <point x="384.11329663090527" y="812.0" />
+      <point x="44.5" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Veiculo">
+      <point x="-66.26666666666665" y="-13.0" />
+      <point x="527.5284301085387" y="610.0" />
+      <point x="311.5385491561578" y="610.0" />
+      <point x="7.666666666666629" y="13.0" />
+    </edge>
+    <edge source="Aluguer" target="Veiculo">
+      <point x="-10.222222222222172" y="13.0" />
+      <point x="289.47470010665677" y="292.0" />
+      <point x="293.0204747788444" y="292.0" />
+      <point x="293.0204747788444" y="484.0" />
+      <point x="295.5082461258548" y="484.0" />
+      <point x="-8.363636363636374" y="-13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Veiculo">
+      <point x="-19.07142857142844" y="-13.0" />
+      <point x="320.5418680594768" y="696.0" />
+      <point x="283.03854915615784" y="696.0" />
+      <point x="283.03854915615784" y="610.0" />
+      <point x="280.87188248949116" y="610.0" />
+      <point x="-23.0" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="User">
+      <point x="66.26666666666665" y="-13.0" />
+      <point x="660.061763441872" y="620.0" />
+      <point x="711.0664938201892" y="620.0" />
+      <point x="711.0664938201892" y="46.0" />
+      <point x="426.2151041470605" y="46.0" />
+      <point x="31.818181818181756" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="Pedido">
+      <point x="57.85714285714286" y="-13.0" />
+      <point x="173.1553954137651" y="620.0" />
+      <point x="377.28108083945045" y="620.0" />
+      <point x="-9.444444444444343" y="13.0" />
+    </edge>
+    <edge source="Pedido" target="Cliente">
+      <point x="10.625" y="-13.0" />
+      <point x="397.3505252838948" y="388.0" />
+      <point x="411.4683509003074" y="388.0" />
+      <point x="-39.42857142857133" y="13.0" />
+    </edge>
+    <edge source="Aluguer" target="Ponto">
+      <point x="-38.33333333333326" y="-13.0" />
+      <point x="261.3635889955457" y="156.0" />
+      <point x="271.4969223288791" y="156.0" />
+      <point x="-5.199999999999818" y="13.0" />
+    </edge>
+    <edge source="Aluguer" target="User">
+      <point x="7.6666666666667425" y="-13.0" />
+      <point x="307.3635889955457" y="186.0" />
+      <point x="375.30601323796975" y="186.0" />
+      <point x="-19.09090909090901" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="UmCarroJaModel">
+      <point x="69.92857142857156" y="-13.0" />
+      <point x="409.5418680594768" y="736.0" />
+      <point x="540.5450967752054" y="736.0" />
+      <point x="-53.25" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="wait">
+      <point x="-38.5714285714286" y="-13.0" />
+      <point x="76.72682398519362" y="620.0" />
+      <point x="70.50000000000006" y="620.0" />
+      <point x="0.0" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Cliente">
+      <point x="31.78571428571422" y="-13.0" />
+      <point x="371.3990109166195" y="706.0" />
+      <point x="450.89692232887876" y="706.0" />
+      <point x="0.0" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaMVC" target="UmCarroJaModel">
+      <point x="32.0" y="-13.0" />
+      <point x="371.61329663090527" y="822.0" />
+      <point x="621.6742965367964" y="822.0" />
+      <point x="621.6742965367964" y="746.0" />
+      <point x="611.5450967752054" y="746.0" />
+      <point x="17.75" y="13.0" />
+    </edge>
+    <edge source="User" target="Aluguer">
+      <point x="-6.36363636363626" y="13.0" />
+      <point x="388.0332859652425" y="206.0" />
+      <point x="338.0302556622122" y="206.0" />
+      <point x="38.33333333333326" y="-13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Cliente">
+      <point x="9.466666666666697" y="-13.0" />
+      <point x="603.2617634418721" y="560.0" />
+      <point x="625.2576298701298" y="560.0" />
+      <point x="625.2576298701298" y="388.0" />
+      <point x="464.03977947173587" y="388.0" />
+      <point x="13.14285714285711" y="13.0" />
+    </edge>
+    <edge source="Veiculo" target="Aluguer">
+      <point x="8.363636363636374" y="-13.0" />
+      <point x="312.23551885312753" y="302.0" />
+      <point x="309.9191445511011" y="302.0" />
+      <point x="10.222222222222172" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Proprietario">
+      <point x="44.5" y="-13.0" />
+      <point x="384.11329663090527" y="716.0" />
+      <point x="501.2950967752053" y="716.0" />
+      <point x="501.2950967752053" y="620.0" />
+      <point x="499.55762987012974" y="620.0" />
+      <point x="-51.200000000000045" y="13.0" />
+    </edge>
+    <edge source="Proprietario" target="Pedido">
+      <point x="-16.0" y="-13.0" />
+      <point x="534.7576298701298" y="454.0" />
+      <point x="424.5033030616726" y="454.0" />
+      <point x="37.77777777777783" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="User">
+      <point x="-31.78571428571422" y="-13.0" />
+      <point x="307.82758234519105" y="706.0" />
+      <point x="215.29825255662223" y="706.0" />
+      <point x="215.29825255662223" y="378.0" />
+      <point x="394.39692232887876" y="378.0" />
+      <point x="0.0" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Aluguer">
+      <point x="-44.5" y="-13.0" />
+      <point x="295.11329663090527" y="716.0" />
+      <point x="204.29825255662223" y="716.0" />
+      <point x="204.29825255662223" y="302.0" />
+      <point x="269.0302556622122" y="302.0" />
+      <point x="-30.666666666666742" y="13.0" />
+    </edge>
+    <edge source="Cliente" target="Aluguer">
+      <point x="-38.33333333333326" y="-13.0" />
+      <point x="412.5635889955455" y="302.0" />
+      <point x="330.3635889955457" y="302.0" />
+      <point x="30.666666666666742" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Ponto">
+      <point x="47.33333333333337" y="-13.0" />
+      <point x="641.1284301085386" y="600.0" />
+      <point x="663.1242965367965" y="600.0" />
+      <point x="663.1242965367965" y="66.0" />
+      <point x="307.89692232887876" y="66.0" />
+      <point x="31.199999999999818" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaModel" target="Pedido">
+      <point x="-37.866666666666674" y="-13.0" />
+      <point x="555.9284301085386" y="580.0" />
+      <point x="407.48954121964965" y="580.0" />
+      <point x="407.48954121964965" y="484.0" />
+      <point x="396.16996972833914" y="484.0" />
+      <point x="9.444444444444343" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="UmCarroJaView">
+      <point x="-82.64285714285734" y="-13.0" />
+      <point x="256.97043948804793" y="746.0" />
+      <point x="132.17325255662223" y="746.0" />
+      <point x="16.875" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaController" target="Ponto">
+      <point x="-57.21428571428578" y="-13.0" />
+      <point x="282.3990109166195" y="726.0" />
+      <point x="193.29825255662223" y="726.0" />
+      <point x="193.29825255662223" y="116.0" />
+      <point x="250.69692232887894" y="116.0" />
+      <point x="-26.0" y="13.0" />
+    </edge>
+    <edge source="Cliente" target="User">
+      <point x="38.33333333333326" y="-13.0" />
+      <point x="489.230255662212" y="302.0" />
+      <point x="492.28441558441546" y="302.0" />
+      <point x="492.28441558441546" y="96.0" />
+      <point x="407.1241950561515" y="96.0" />
+      <point x="12.727272727272748" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="Aluguer">
+      <point x="19.285714285714278" y="-13.0" />
+      <point x="134.5839668423365" y="600.0" />
+      <point x="151.0465262877218" y="600.0" />
+      <point x="151.0465262877218" y="292.0" />
+      <point x="258.80803343999" y="292.0" />
+      <point x="-40.888888888888914" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="Veiculo">
+      <point x="38.57142857142857" y="-13.0" />
+      <point x="153.8696811280508" y="610.0" />
+      <point x="265.53854915615784" y="610.0" />
+      <point x="-38.333333333333314" y="13.0" />
+    </edge>
+    <edge source="Veiculo" target="Ponto">
+      <point x="-25.090909090909065" y="-13.0" />
+      <point x="278.7809733985821" y="464.0" />
+      <point x="243.19692232887894" y="464.0" />
+      <point x="243.19692232887894" y="146.0" />
+      <point x="266.29692232887885" y="146.0" />
+      <point x="-10.400000000000091" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaView" target="User">
+      <point x="0.0" y="-13.0" />
+      <point x="115.29825255662223" y="620.0" />
+      <point x="127.00000000000003" y="620.0" />
+      <point x="127.00000000000003" y="166.0" />
+      <point x="362.578740510697" y="166.0" />
+      <point x="-31.818181818181756" y="13.0" />
+    </edge>
+    <edge source="Pedido" target="Ponto">
+      <point x="-31.875" y="-13.0" />
+      <point x="354.8505252838948" y="368.0" />
+      <point x="356.19692232887894" y="368.0" />
+      <point x="356.19692232887894" y="156.0" />
+      <point x="281.89692232887876" y="156.0" />
+      <point x="5.199999999999818" y="13.0" />
+    </edge>
+    <edge source="UmCarroJaMVC" target="UmCarroJaView">
+      <point x="-53.333333333333485" y="-13.0" />
+      <point x="286.2799632975718" y="832.0" />
+      <point x="82.54120741577259" y="832.0" />
+      <point x="82.54120741577259" y="746.0" />
+      <point x="64.67325255662223" y="746.0" />
+      <point x="-50.625" y="13.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="0.7383073496659243" x="356.0" y="439.0" />
+  <SelectedNodes />
+  <Categories />
+  <SCOPE>Project Files</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
