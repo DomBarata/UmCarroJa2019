@@ -115,10 +115,6 @@ public class Veiculo implements Serializable {
 		return this.numeroAvaliacoes;
 	}
 
-	public Veiculo clone(){
-		return new Veiculo(this);
-	}
-
 	public void classificar(int valor) {
 		if(this.numeroAvaliacoes == 0){
 			this.classificacao = valor;
@@ -193,4 +189,9 @@ public class Veiculo implements Serializable {
 				.append(this.localizacao);
 		return sb.toString();
 	}
+
+    @Override
+    public Veiculo clone() {
+        return new Veiculo(this);
+    }
 }

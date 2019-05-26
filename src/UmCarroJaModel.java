@@ -1,5 +1,4 @@
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -32,6 +31,30 @@ public class UmCarroJaModel implements Serializable {
 
     public void createData()
     {
+        try {
+            FileInputStream fin = new FileInputStream("logsPOO_Proprietarios.ser");
+            ObjectInputStream ois = new ObjectInputStream(fin);
+            this.proprietarioMap.putAll((Map<String, Proprietario>) ois.readObject());
+            ois.close();
+
+            fin = new FileInputStream("logsPOO_Clientes.ser");
+            ois = new ObjectInputStream(fin);
+            this.clientesMap.putAll((Map<String, Cliente>) ois.readObject());
+            ois.close();
+
+            fin = new FileInputStream("logsPOO_estadoVeiculos.ser");
+            ois = new ObjectInputStream(fin);
+            this.veiculosMap.putAll((Map<String, Veiculo>) ois.readObject());
+            ois.close();
+        }
+        catch (FileNotFoundException io){
+            lerCarregamentoInicial();}
+        catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void lerCarregamentoInicial(){
         List<String> input = lerAllLines("logsPOO_carregamentoInicial.bak");
         String[] divisao;
         String[] argumentos;
@@ -41,20 +64,20 @@ public class UmCarroJaModel implements Serializable {
             switch (divisao[0])
             {
                 case "NovoProp":    argumentos = divisao[1].split(",");
-                                    this.proprietarioMap.put(argumentos[2], new Proprietario(argumentos));
-                                    break;
+                    this.proprietarioMap.put(argumentos[2], new Proprietario(argumentos));
+                    break;
                 case "NovoCliente": argumentos = divisao[1].split(",");
-                                    this.clientesMap.put(argumentos[2], new Cliente(argumentos));
-                                    break;
+                    this.clientesMap.put(argumentos[2], new Cliente(argumentos));
+                    break;
                 case "NovoCarro":   argumentos = divisao[1].split(",");
-                                    this.veiculosMap.put(argumentos[2], new Veiculo(argumentos));
-                                    break;
+                    this.veiculosMap.put(argumentos[2], new Veiculo(argumentos));
+                    break;
                 case "Aluguer":     argumentos = divisao[1].split(",");
-                                    insereAluguer(argumentos);
-                                    break;
+                    insereAluguer(argumentos);
+                    break;
                 case "Classificar": argumentos = divisao[1].split(",");
-                                    classifica(argumentos);
-                                    break;
+                    classifica(argumentos);
+                    break;
                 default:            break;
             }
         }
@@ -126,6 +149,9 @@ public class UmCarroJaModel implements Serializable {
 
     }
 
+    public void inserirVeiculoAbastecido(Veiculo v) {
+        this.veiculosMap.put(v.getMatricula(), v);
+    }
 
     public void inserirVeiculo(Veiculo v) {
         if(!veiculosMap.containsKey(v.getMatricula()))
@@ -191,10 +217,11 @@ public class UmCarroJaModel implements Serializable {
 
     public int fazerPedido(String nif, String matricula, Ponto<Double> destino) {
         Pedido pedido = new Pedido(this.clientesMap.get(nif).clone(),
-                this.veiculosMap.get(matricula).clone(),
+                this.veiculosMap.get(matricula),
                 destino);
 
-        Proprietario p = this.proprietarioMap.get(this.veiculosMap.get(matricula).getNifProp());
+        String nifP = this.veiculosMap.get(matricula).getNifProp();
+        Proprietario p = this.proprietarioMap.get(nifP);
         int numeroEspera = p.addPedido(pedido);
         this.proprietarioMap.put(p.getNif(), p);
 
@@ -295,18 +322,22 @@ public class UmCarroJaModel implements Serializable {
     }
 
     public Pedido getPedido(String nif) {
-        Cliente cliente = this.clientesMap.get(nif);
-        Set<String> prop = this.proprietarioMap.keySet();
+        Cliente cliente = this.clientesMap.get(nif); //cliente que está a procura do pedido
+        Set<String> prop = this.proprietarioMap.keySet(); //set com os nifs dos proprietarios
         Pedido pedido = null;
-        for(String s : prop){
-            Proprietario proprietario = this.proprietarioMap.get(s);
-            Map<String, List<Pedido>> pedidos = proprietario.getListaDeEspera();
-            Set<String> matriculas = pedidos.keySet();
-            for(String str : matriculas){
+        for(String s : prop){ //Para cada proprietario fazer:
+            Proprietario proprietario = this.proprietarioMap.get(s); //get proprietario atraves do nif
+            Map<String, List<Pedido>> pedidos = proprietario.getListaDeEspera(); //get map de espera desse proprietario
+            Set<String> matriculas = pedidos.keySet(); //set de matriculas
+            for(String str : matriculas){//para cada matricula
                 List<Pedido> espera = pedidos.get(str);
-                for(Pedido p : espera){
-                    if (p.getCliente().equals(cliente))
-                        pedido = p.clone();
+                if(!espera.isEmpty()) {
+                    for (Pedido p : espera) { //para cada lista de pedidos
+                        if (p.getCliente().equals(cliente)) {//Se o cliente do pedido for igual ao cliente do nif
+                            pedido = p; //atribuir ao pedido
+
+                        }
+                    }
                 }
             }
         }
@@ -314,8 +345,9 @@ public class UmCarroJaModel implements Serializable {
     }
 
     public void pedidoRejeitado(Pedido p) {
-        Proprietario prop = proprietarioMap.get(p.getVeiculo().getNifProp());
-        List<Pedido> pedidos = prop.getListaDeEspera().get(p.getVeiculo().getMatricula());
+        Proprietario prop = proprietarioMap.get(p.getVeiculo().getNifProp());//get prop do veiculo em questao no pedido
+        Map<String, List<Pedido>> lista = prop.getListaDeEspera();
+        List<Pedido> pedidos = lista.get(p.getVeiculo().getMatricula());
         pedidos.remove(p);
         prop.insereLista(p.getVeiculo().getMatricula(), pedidos);
         this.proprietarioMap.put(prop.getNif(), prop);
@@ -344,4 +376,31 @@ public class UmCarroJaModel implements Serializable {
         this.clientesMap.put(cli.getNif(), cli);
     }
 
+    public void saveStatus() {
+        try {
+            FileOutputStream fout = new FileOutputStream("logsPOO_Proprietarios.ser", false);
+            ObjectOutputStream oos = new ObjectOutputStream(fout);
+            oos.writeObject(this.proprietarioMap);
+            oos.close();
+
+            fout = new FileOutputStream("logsPOO_Clientes.ser", false);
+            oos = new ObjectOutputStream(fout);
+            oos.writeObject(this.clientesMap);
+            oos.close();
+
+            fout = new FileOutputStream("logsPOO_estadoVeiculos.ser", false);
+            oos = new ObjectOutputStream(fout);
+            oos.writeObject(this.veiculosMap);
+            oos.close();
+        }
+        catch (IOException io){io.printStackTrace();}
+    }
+
+    public boolean isEmpty() {
+        return (proprietarioMap.isEmpty() && clientesMap.isEmpty() && veiculosMap.isEmpty());
+    }
+
+    public boolean containsMatricula(String matricula) {
+        return veiculosMap.containsKey(matricula);
+    }
 }

@@ -1,8 +1,8 @@
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
 import static java.lang.System.out;
 
 public class UmCarroJaView {
@@ -28,9 +28,9 @@ public class UmCarroJaView {
     }
 
     public int wrongUser(){
-        out.println("O NIF inserido nao existe!");
-        out.println("Se e novo na aplicacao, vamos criar um user");
-        out.println("Escolha a opcao pretendida");
+        out.println("O NIF inserido não existe!");
+        out.println("Se é novo na aplicacao, vamos criar um user");
+        out.println("Escolha a opção pretendida");
         out.println("\t1 se é um proprietário de veículos");
         out.println("\t2 se é um cliente que pretende requesitar veículos");
         out.println("\t0 se se enganou a inserir o NIF e pretende iniciar sessão");
@@ -77,16 +77,9 @@ public class UmCarroJaView {
         out.println("Insira a sua morada");
         input = new Scanner(System.in);
         dados.add(input.next());
-        out.println("Insira a sua data de nascimento (DD-MM-AAAA)");
+        out.println("Insira a sua data de nascimento (AAAA-MM-DD)");
         input = new Scanner(System.in);
-        String[] s = input.next().split("-");
-        dados.add(s[0]);
-        dados.add(s[1]);
-        dados.add(s[2]);
-
-
-        for(String str : dados)
-            out.println(str);
+        dados.add(input.next());
 
         return dados;
     }
@@ -145,19 +138,19 @@ public class UmCarroJaView {
     public double getVelMedia() {
         out.println("Insira a velocidade média do carro");
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextDouble();
+        return Double.parseDouble(scanner.next());
     }
 
     public double getPrecoKm() {
         out.println("Insira o preço/km");
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextDouble();
+        return Double.parseDouble(scanner.next());
     }
 
     public double getConsumoKm() {
         out.println("Insira o consumo/km");
         Scanner scanner = new Scanner(System.in);
-        return scanner.nextDouble();
+        return Double.parseDouble(scanner.next());
     }
 
     public int getAutonomia(){
@@ -182,7 +175,7 @@ public class UmCarroJaView {
         out.println("\tInsira o valor em EUR que pretende abastecer");
 
         input = new Scanner(System.in);
-        return input.nextDouble();
+        return Double.parseDouble(input.next());
     }
 
 
@@ -191,11 +184,13 @@ public class UmCarroJaView {
             out.print(entry.getKey()+ ": ");
             List<Pedido> pedidos = entry.getValue();
             for (Pedido p: pedidos) {
-                out.println("--------  " + p.getNumeroPedido() +"  --------");
-                out.println("\tNome: " + p.getCliente().getNome());
-                out.println("\tNIF: " + p.getCliente().getNif());
-                out.println("\tInicio: " + p.getVeiculo().getLocalizacao());
-                out.println("\tFim: " + p.getDestino());
+                if(p.getEstado() == 0) {
+                    out.println("--------  " + p.getNumeroPedido() + "  --------");
+                    out.println("\tNome: " + p.getCliente().getNome());
+                    out.println("\tNIF: " + p.getCliente().getNif());
+                    out.println("\tInicio: " + p.getVeiculo().getLocalizacao());
+                    out.println("\tFim: " + p.getDestino());
+                }
             }
             out.println();
         }
@@ -221,7 +216,6 @@ public class UmCarroJaView {
         out.print("Prima ENTER para ver histório de alugueres...");
             new wait();
             printAlugueres(u.getHistorico());
-            new wait();
     }
 
     private void printAlugueres(List<Aluguer> historico) {
@@ -238,7 +232,7 @@ public class UmCarroJaView {
         if(historico.size() == 0){
             out.println("Não há histórico de alugueres para apresentar");
         }
-
+        new wait();
     }
 
     public int clienteMenu() {
@@ -272,6 +266,8 @@ public class UmCarroJaView {
             out.println("e o veículo ainda não tem classificações");
         else
             out.println("e o veículo está classificado em " + v.getClassificacao() + "/100");
+        out.println();
+        new wait();
     }
 
     public double getDistancia() {
@@ -342,12 +338,17 @@ public class UmCarroJaView {
     }
 
     public void veiculoNaoExistente(String matricula) {
-    out.println("O veículo com a matrícula " + matricula + " não existe ou não lhe pertence");
-    new wait();
+        out.println("O veículo com a matrícula " + matricula + " não existe");
+        new wait();
     }
 
     public void userNaoExiste(String nif) {
-    out.println("O user com o NIF " + nif + " não existe");
-    new wait();
+        out.println("O user com o NIF " + nif + " não existe");
+        new wait();
+    }
+
+    public void veiculoNaoExistente() {
+        out.println("Não existe veículo dentro dos parâmetros selecionados");
+        new wait();
     }
 }

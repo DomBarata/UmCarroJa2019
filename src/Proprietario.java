@@ -45,6 +45,7 @@ public class Proprietario extends User implements Serializable {
         List<Pedido> p = this.listaDeEspera.get(matricula);
         Pedido ped = p.get(0);
         ped.setEstado(estado);
+        p.add(0,ped);
     }
 
     public Proprietario clone(){
